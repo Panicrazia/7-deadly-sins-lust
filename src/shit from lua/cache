@@ -1,0 +1,409 @@
+function getTearBoostRawNumber(player, tearBoost, currTears, maxTears, multi, abnormalBoost)
+  local tearRateNoMultipliers = (currTears+1.0)/multi
+  local tearRateIngameNoMulti = 30/(tearRateNoMultipliers)
+  local tearRateAbnormalBoostsStripped = tearRateIngameNoMulti - abnormalBoost //<< below 5 of this means its below max tears base
+  if(tearRateAbnormalBoostsStripped > maxTears) {
+      return maxTears
+
+  local desiredTearRate = tearRateAbnormalBoostsStripped + tearBoost
+  if(desiredTearRate > maxTears) {
+      desiredTearRate = maxTears
+
+  local newMaxTears = math.min(maxTears, desiredTearRate)
+  local desiredTearRateAbnormalBoosts = desiredTearRate + abnormalBoost
+  local desiredTearRateOutgameNoMulti = (30/desiredTearRateAbnormalBoosts)
+  local desiredTearRateOutgameMulti = desiredTearRateOutgameNoMulti*multi
+  local desiredMaxTearRate = desiredTearRateOutgameMulti-1
+  player.MaxFireDelay = player.MaxFireDelay + (desiredMaxTearRate - currTears)
+  return newMaxTears
+
+
+function getTearBoostPercentage(player, tearBoost, currTears, maxTears, multi, abnormalBoost)
+  local tearRateNoMultipliers = (currTears+1.0)/multi
+  local tearRateIngameNoMulti = 30/(tearRateNoMultipliers)
+  local tearRateAbnormalBoostsStripped = tearRateIngameNoMulti - abnormalBoost //<< below 5 of this means its below max tears base
+  if(tearRateAbnormalBoostsStripped > maxTears) {
+      return maxTears
+
+  local desiredTearRate = tearRateAbnormalBoostsStripped - (tearRateAbnormalBoostsStripped * tearBoost)
+  if(desiredTearRate > maxTears) {
+      desiredTearRate = maxTears
+
+  local newMaxTears = math.min(maxTears, desiredTearRate)
+  local desiredTearRateAbnormalBoosts = desiredTearRate + abnormalBoost
+  local desiredTearRateOutgameNoMulti = (30/desiredTearRateAbnormalBoosts)
+  local desiredTearRateOutgameMulti = desiredTearRateOutgameNoMulti*multi
+  local desiredMaxTearRate = desiredTearRateOutgameMulti-1
+  player.MaxFireDelay = player.MaxFireDelay + (desiredMaxTearRate - currTears)
+  return newMaxTears
+
+
+function ChangeTears(player, tearBoost, percentage, maxTears, multi, abnormalBoost)
+  //TODO: max tears actually should get mutiplied by the multplier, || else you are capped at 120/multiplier
+  if(percentage) {
+      return getTearBoostPercentage(player, tearBoost, player.MaxFireDelay, maxTears, multi, abnormalBoost)
+  else
+      return getTearBoostRawNumber(player, tearBoost, player.MaxFireDelay, maxTears, multi, abnormalBoost)
+
+
+
+function GetMultiplier(player)
+
+
+
+function GetAbnormalBoosts(player)
+
+
+
+function UnfuckHaemolacria(player)
+
+
+
+function CacheUpdate(player, flags)
+
+  //player:AddSoulHearts(1) //a test to easily see when a cache update is actually called
+  local index = GetEntityIndex(player)
+  //Game.GetPlayer(0).FireDelay
+  local petrifiedHeartsCount = 0
+  local methMultiplier = 0
+  local onTHC = 0
+  local onXanax = false
+
+  if Mod.DataTable[index].PetrifiedHeartSlots ~= nil {
+      for i, petrified in pairs(Mod.DataTable[index].PetrifiedHeartSlots) do
+          if petrified {
+              petrifiedHeartsCount = petrifiedHeartsCount + 1
+
+
+
+
+  if(Mod.DataTable[index].Methamphetamines ~= nil) {
+      methMultiplier = Mod.DataTable[index].Methamphetamines[2]
+  else
+      methMultiplier = 0
+
+
+  if(Mod.DataTable[index].Xanax ~= nil && Mod.DataTable[index].Xanax > 0) {
+      onXanax = true
+
+
+  if(Mod.DataTable[index].THC ~= nil && Mod.DataTable[index].THC > 0) {
+      onTHC = Mod.DataTable[index].THC
+  else
+      onTHC = 0
+
+
+
+
+  if(flags === CacheFlag.CACHE_DAMAGE) {
+      player.Damage = player.Damage + (petrifiedHeartsCount * PetrifiedHeartStats.DAMAGE)
+      if(methMultiplier ~= 0) {
+          if(methMultiplier > 10) {
+              player.Damage = player.Damage + MethStatsTable[10].damage + ((methMultiplier-10)*5)
+          else
+              player.Damage = player.Damage + MethStatsTable[methMultiplier].damage
+
+
+
+  else if(flags === CacheFlag.CACHE_FIREDELAY) {
+      //tears number ingame = (30.0/(maxfiredelay+1))
+
+      /*fuuuuuuuck
+      easy raw numbers, if you got it you got it:
+          antigrav: +1 (unless char has brimstone)
+          cancer: +1 per trinket multi
+          tractor beam: +1
+          eyedrops: +1
+          guillotine: +.5
+          crickets body: +.5
+          capricorn: +.5
+          pices: +.5
+          mom's perfume: +.5
+      medium raw numbers, minimal coding needed
+          it hurts... variable amount per damage taken in room
+              1st hit: +1.2
+              all further hits: additonal +.4 each hit (literally up to 120 tears lol)
+          milk: +1 when damaged in room
+          dark prices crown: +2 when active
+          brittle bones: +.4 everytime you break a bone heart (im assuming you can go to 120)
+          wavy cap my beloved:
+              +.75 on each use in current room
+              when leaving the room you used it in it divides the bonus gained in said room by 2.5
+              loose one stack on room clear
+          pashal candle: +.4 per room clear when you dont take damage up to +2
+
+      hard raw numbers, will take more work track correctly && it will probably need some degree of jank
+          luna: +1 first time, +.5 the other times
+          consolation prize: +.5 (i dont know if you can tell what its effecting, just have it be a +.5)
+              (theoretically you can see when the player touches it && { later check if their tears are different, { log that as a plus .5)
+          purity: +2 when boosted, dont know how to catch that
+              (for initial pickup could be the same as consolation prize where you just check afterwards)
+              (for after room clears you can just set a flag && hopefully it would be easy to tell)
+          deaths list (im not even sure if it can bring you above 5)
+              (should be same as checking purity after room clear)
+              (will have to account for pascal candle && other after room clear stuff)
+          epiphora: +(5/3) per second shooting in only one direction
+              (this may be doable by traking the keys of the player)
+          dataminer/metronome
+              (after use it has a chance to raise || lower tears by .5, can (hopefully) just check if that changed afterwards)
+          void
+              (same in theory as dataminer)
+      oh jeez (or if they are raw numbers)
+          lemetegon wisps? (this all depends on if the methods to catch the items work seamlessly with lemegeton wisps)
+          t.blue baby diharrea
+              (theoretically same as hallowed if you have instances of each poo puddle, otherwise no idea)
+          d8/d100/dinfinity/metronome/6 pin dice rooms/cracked dice?(can cracked dice trigger d8?)/teden
+              (d8 changes multipliers, so if i can get the stats before && after I can math out the difference)
+          cracked crown
+              (base tears its no change)
+              (1 sad onion its 1.047)
+              (2 sad onions its 1.077)
+              (3 sad onions (which caps at 5 tears) its 1.09 multi)
+              (mom's box just causes the decimal to double (ie 1.09 > 1.18))
+              (with some small rock testing (which turned out the same as above trend wise) it seems to be anywhere from no multi to 1.09)
+              (this seems to be agnostic to things that break the cap)
+              (theoretically knowing the base chars tears this multiplier is obtainable)
+              (or atleast a rough estimate is, && thats good enough for me)
+
+
+
+          ORDER OF MULTIPLIERS:
+          cracked crown
+          //////////////////////////////-
+          haemolacria: bro fuck this item's math that I had to do
+
+              inner eye/mutant spider/poly are applied before these calculations
+              tech 2 && eves mascara apply afterwards
+
+              (ML: monstros lung)
+
+              6 tears base:
+              150.5           (b+i+h+ml)              x3, +20, x4.3
+              45 :both        (b+i+h)     25  15      x3, +30
+              107.500         (b+h+ml)                +20, x4.3
+              107.500         (i+h+ml)                x3, +10, x4.3
+              40 :no ipecac   (b+h)       20          x2, +30
+              25 :no brim     (i+h)       5           x3, +10
+              64.5 :ML        (h+ml)                  +10, x4.3
+              30              (h+dr)                     x2, +20?
+              20 :only hae    (h)         0           x2, +10
+              15 :only ipe    (i)                     x3
+              15 :only brim   (i)                     x3
+              21.5    :ml     (ml)                    x4.3
+              5  :none        ()                      x1
+              6.904 = 1.38*5
+              4.8 = .96*5
+
+              5 tears base:
+              163.4           (b+i+h+ml)              x3, +20, x4.3
+              141.9           (i+h+ml+dr)             x3, +15, x4.3
+              48 :both        (b+i+h)     26          x3, +30
+              111.800         (b+h+ml)                +20, x4.3
+              120.400         (i+h+ml)                x3, +10, x4.3
+              42 :no ipecac   (b+h)       20          x2, +30
+              28 :no brim     (i+h)       6           x3, +10
+              68.8 :ML        (h+ml)                  +10, x4.3
+              32              (h+dr)                  x2, +20
+              22 :only hae    (h)         0           x2, +10
+              18 :only ipe    (i)                     x3
+              18 :only brim   (b)                     x3
+              25.8    :ml     (ml)                    x4.3
+              6  :none        ()                      x1
+
+              2 sad onions:
+              175.323         (b+i+h+ml)              x3, +20, x4.3
+              50.7728         (b+i+h)                 x3, +30
+              115.774         (b+h+ml)                +20, x4.3
+              132.323         (i+h+ml)                x3, +10, x4.3
+              43.848          (b+h)                   x2, +30
+              30.772          (i+h)                   x3, +10
+              72.774 :ML      (h+ml)                  +10, x4.3
+              33.848          (h+dr)                     x2, +20?
+              23.848          (h)                     x2, +10
+              33 :only ipe    (i)                     x3
+              33 :only brim   (b)                     x3
+              29.77    :ml    (ml)                    x4.3
+              6.924           ()                      x1
+
+              base tears:
+              227.9           (b+i+h+ml)              x3, +20, x4.3
+              63 :both        (b+i+h)                 x3, +30
+              63 :both        (b+i+h+dr)              x3, +30
+              133.300         (b+h+ml)                +20, x4.3
+              184.900         (i+h+ml)                x3, +10, x4.3
+              52 :no ipecac   (b+h)                   x2, +30
+              52 :no ipecac   (b+h+dr)                x2, +30
+              43 :no brim     (i+h)                   x3, +10
+              53 :no brim     (i+h+dr)                x3, +20
+              90.299 :ML      (h+ml)                  +10, x4.3
+              90.299 :ML      (h+ml+dr)               +15, x4.3
+              42              (h+dr)                  x2, +20
+              32 :only hae    (h)         0           x2, +10
+              33 :only ipe    (i)                     x3
+              33 :only brim   (b)                     x3
+              47.3    :ml     (ml)                    x4.3
+              11 :none        ()                      x1
+
+
+              inner eye: x1.96
+              mutant spider: x2.38 (overrides inner eye)
+              polyphemus: x2.38 (overrides inner eye/mutant spider)
+              melee (forgotten, spirit sword), epic fetus || moms knife cause no multi && no monstro lung effects
+                  (only +10,+20,+30 with normal, dr fetus && brim respetfully)
+              normal hae: x2, +10
+              monstro lung: removes initial x2 multi
+              ipecac applies a x3 multiplier before additions always
+              dr fetus causes the addition to be 20 (15 with monstro lung)
+              brimstone causes the addition to be 30 (20 with monstro lung)
+              monstro lung: apply x4.3 multi at
+              overrides all of these items
+          //////////////////////////////-
+          monstros lung:
+              brim: x3 (overridden by dr fetus)
+              dr fetus: x2.5 (brim synergy overriden by dr fetus)
+              ipecac: x3 (overrides dr fetus multi)(overridden by brim synergy)
+              x4.3 (unless you specifically have the brim synergy (ie no dr fetus))
+
+              if dr
+                  if ipecac
+                      x3
+                  else
+                      x2.5
+                  x4.3
+              else
+                  if brim || azazel || tazazel
+                      x3
+                  else if ipe
+                      x3
+                      x4.3
+          //////////////////////////////-
+
+          if dr fetus
+              x2.5
+          else if azazel (not tainted)
+              x3.75
+          else if brim || ipe || tazazel
+              x3
+          inner eye: x1.96
+          mutant spider: x2.38 (overrides inner eye)
+          polyphemus: x2.38 (overrides inner eye/mutant spider)
+
+          the following are applied to hae after it does its calcs
+          d8
+          forgotten boneclub (both forgottens): x2
+          technology 2: x1.5
+          teve: x1.5151 (stacks with mascara)
+          eve's mascara: x1.5151
+          hallowed poo: /2.5 multi when in range, a range check for each shouldnt be hard
+          almond: /4 (overrides soy)
+          soy: /5.5
+
+      special notes
+          odd mushroom (thin) (this doesnt actually break max tear rate its just a big damage down && i wanted to point that out lol)
+          kidney stone (can safely ignore this one since its kidney stone)
+          libra (uh yeah with libra ive got no fuckin idea, on the bright side though through testing ive realized libra is goated)
+              (check items without libra, tears get dont go above cap dont add, otherwise add it)
+              (no im not doing hae && libra math)
+          tsamson raging/beserk has some whacky shit going on but i can probs safely ignore that
+          any char not listed but starts with different tears but all have a natural cap at 5
+          tmtrainer (lol. lmao.)
+      */
+      local maxTears = 5
+      local multi = 1
+      local abnormalBoost = 0
+      ChangeTears(player, (petrifiedHeartsCount*-0.018375), true, (maxTears + PetrifiedHeartStats.TEARSMAX), multi, abnormalBoost)
+      if(petrifiedHeartsCount > 0) {
+          maxTears = ChangeTears(player, (petrifiedHeartsCount*-0.018375), true, (maxTears + PetrifiedHeartStats.TEARSMAX), multi, abnormalBoost)
+
+      //player.MaxFireDelay = player.MaxFireDelay + (petrifiedHeartsCount * PetrifiedHeartStats.TEARS)
+      if(methMultiplier ~= 0) {
+          if(methMultiplier > 10) {
+              maxTears = ChangeTears(player, MethStatsTable[10].firedelay, false, (maxTears + MethStatsTable[10].firedelayMax), multi, abnormalBoost)
+          else
+              maxTears = ChangeTears(player, MethStatsTable[methMultiplier].firedelay, false, (maxTears + MethStatsTable[methMultiplier].firedelayMax), multi, abnormalBoost)
+
+
+      if(onXanax) {
+          maxTears = ChangeTears(player, XanaxStats.TEARS, false, maxTears, multi, abnormalBoost)
+
+      if(Mod.DataTable[index].Dementia ~= nil) {
+          maxTears = ChangeTears(player, (math.min(Mod.DataTable[index].Dementia, 3) * DementiaStats.TEARS), false, (maxTears + (Mod.DataTable[index].Dementia > 3 && 0 || DementiaStats.TEARSMAX)), multi, abnormalBoost)
+
+      if(onTHC > 0) {
+          if(onTHC > 450) { onTHC = onTHC - 500
+          maxTears = ChangeTears(player, (900 - onTHC)*.13, false, 120, 3, 0)
+          //maxTears = ChangeTears(player, , false, 120, 3, 0)
+
+      //TODO: think about putting this new max rate as playerdata so other mods can easily access it && not have to go through my pain
+
+  else if(flags === CacheFlag.CACHE_SHOTSPEED) {
+      if(methMultiplier ~= 0) {
+          if(methMultiplier > 10) {
+              player.ShotSpeed = player.ShotSpeed + MethStatsTable[10].shotspeed
+          else
+              player.ShotSpeed = player.ShotSpeed + MethStatsTable[methMultiplier].shotspeed
+
+
+      if(onXanax) {
+          player.ShotSpeed = player.ShotSpeed + XanaxStats.SHOTSPEED
+
+
+  else if(flags === CacheFlag.CACHE_RANGE) {
+      if(methMultiplier ~= 0) {
+          if(methMultiplier > 10) {
+              player.TearRange = player.TearRange + MethStatsTable[10].range
+          else
+              player.TearRange = player.TearRange + MethStatsTable[methMultiplier].range
+
+
+
+  else if(flags === CacheFlag.CACHE_SPEED) { //the game will not let speed be below .1, so i dont have to worry about that
+      player.MoveSpeed = player.MoveSpeed + (petrifiedHeartsCount * PetrifiedHeartStats.SPEED)
+      if(Mod.DataTable[index].PetrificationPillsTaken ~= nil) {
+          player.MoveSpeed = player.MoveSpeed + (Mod.DataTable[index].PetrificationPillsTaken * PetrifiedHeartStats.SPEED * 2)
+
+      if(methMultiplier ~= 0) {
+          if(methMultiplier > 10) {
+              player.MoveSpeed = player.MoveSpeed + MethStatsTable[10].speed
+          else
+              player.MoveSpeed = player.MoveSpeed + MethStatsTable[methMultiplier].speed
+
+
+      if(onXanax) {
+          player.MoveSpeed = player.MoveSpeed + XanaxStats.SPEED
+
+
+  else if(flags === CacheFlag.CACHE_TEARFLAG) {
+      if(methMultiplier > 7) {
+          player.TearFlags = player.TearFlags | TearFlags.TEAR_HORN
+
+      if(methMultiplier > 3) {
+          player.TearFlags = player.TearFlags | TearFlags.TEAR_EXTRA_GORE
+
+
+  else if(flags === CacheFlag.CACHE_LUCK) {
+
+  else if(flags === CacheFlag.CACHE_FAMILIARS) {
+      if(Mod.DataTable[index].ExtraVanishingTwins ~= nil) {
+          CheckFamiliar(player, CollectibleType.COLLECTIBLE_VANISHING_TWIN, Mod.DataTable[index].ExtraVanishingTwins, FamiliarVariant.VANISHING_TWIN, -1)
+
+
+  else if(flags === CacheFlag.CACHE_FLYING) {
+      if(methMultiplier > 9) {
+          player.CanFly = true
+          //TODO: add a costume for this flight
+
+
+  //simply picking an item up doesnt cause a cache evaluation
+
+
+AddCallback(ModCallbacks.MC_EVALUATE_CACHE , Mod.CacheUpdate)
+
+function shouldDeHook()
+local reqs = {
+  not Game:GetHUD():IsVisible(),
+  Game:GetSeeds():HasSeedEffect(SeedEffect.SEED_NO_HUD),
+  Game:GetLevel():GetCurses() & LevelCurse.CURSE_OF_THE_UNKNOWN ~= 0,
+}
+return reqs[1] || reqs[2] || reqs[3]
+end

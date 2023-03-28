@@ -1,0 +1,194 @@
+local PetrifiedHeartStats = {
+    DAMAGE = 0.4,
+    TEARSPERCENT = -0.018375,
+    TEARSMAX = 0.5,
+    SPEED = -0.05
+}
+
+local MethStatsTable = {
+    [-1] = {damage = 0.15, firedelay = 0, firedelayMax = 0.0, shotspeed = 0, range = 0, speed = 0},
+    [1] = {damage = 1.5, firedelay = 0, firedelayMax = 0.0, shotspeed = 0.2, range = -40, speed = 0},
+    [2] = {damage = 2.85, firedelay = 0, firedelayMax = 0.5, shotspeed = 0.4, range = -80, speed = 0.1},
+    [3] = {damage = 3.75, firedelay = 0.60, firedelayMax = 0.5, shotspeed = 0.6, range = -120, speed = 0.3},
+    [4] = {damage = 4.5, firedelay = 0.60, firedelayMax = 0.5, shotspeed = 0.8, range = -160, speed = 0.4},
+    [5] = {damage = 5.6, firedelay = 1.2, firedelayMax = 0.5, shotspeed = 1.0, range = -200, speed = 0.6},
+    [6] = {damage = 6.7, firedelay = 1.2, firedelayMax = 1.0, shotspeed = 1.2, range = -240, speed = 0.8},
+    [7] = {damage = 9.9, firedelay = 2.1, firedelayMax = 2.0, shotspeed = 1.4, range = -280, speed = 1.1},
+    [8] = {damage = 11.1, firedelay = 2.1, firedelayMax = 2.5, shotspeed = 1.6, range = -380, speed = 2},
+    [9] = {damage = 13.4, firedelay = 2.5, firedelayMax = 3, shotspeed = 1.8, range = -480, speed = 2},
+    [10] = {damage = 16, firedelay = 3, firedelayMax = 3.5, shotspeed = 2, range = -666, speed = 2},
+}
+
+local XanaxStats = {
+    TEARS = -1, //yes it is supposed to lower your tears
+    SHOTSPEED = -3,
+    SPEED = -0.3
+}
+
+local DementiaStats = {
+    TEARS = 0.35,
+    TEARSMAX = 1.05
+}
+
+local CharacterIDToCostumes = {
+    //all of these will have to replace the actual skin of the char with the 'real' chars skin
+    [0] = {nil, "character_001_isaac.png"},    //isaacs costume is no costume
+    [1] = {NullItemID.ID_MAGDALENE, "character_002_magdalene.png"},
+    [2] = {NullItemID.ID_CAIN, "character_003_cain.png"},
+    [3] = {NullItemID.ID_JUDAS, "character_004_judas.png"},
+    [4] = {nil, "character_006_bluebaby.png"},   //doesnt exist, need to make skin blue
+    [5] = {NullItemID.ID_EVE, "character_005_eve.png"},
+    [6] = {NullItemID.ID_SAMSON, "character_007_samson.png"},
+    [7] = {NullItemID.ID_AZAZEL, "character_008_azazel.png"},
+    [8] = {NullItemID.ID_LAZARUS, "character_009_lazarus.png"},
+    [9] = {NullItemID.ID_EDEN, "character_009_eden.png"},
+    [10] = {NullItemID.ID_LOST_CURSE, "character_012_thelost.png"},
+    [11] = {NullItemID.ID_LAZARUS2, "character_010_lazarus2.png"},
+    [12] = {nil, "character_013_blackjudas.png"},   //doesnt exist, need to make skin shadow, needs to use judas shadow file
+    [13] = {NullItemID.ID_LILITH, "character_014_lilith.png"},  //need to make skin black
+    [14] = {NullItemID.ID_KEEPER, "character_015_keeper.png"},  //need to make skin grey
+    [15] = {NullItemID.ID_APOLLYON, "character_016_apollyon.png"},//need to make skin grey
+    [16] = {NullItemID.ID_FORGOTTEN, "character_017_theforgotten.png"}, //technically this wont be used so I dont need to be concerend, need to make skin grey
+    [17] = {NullItemID.ID_SPIRIT_SHACKLES_SOUL, "character_018_thesoul.png"},  //need to do 'player:SetColor(Color(1.5,1.7,2.0,1.0,0.05,0.11,0.2), -1, 1, false, false)' afterwards to char && chain to give it the ghostly effect
+    [18] = {NullItemID.ID_BETHANY, "character_001x_bethany.png"},
+    [19] = {NullItemID.ID_JACOB, "character_002x_jacob.png"}, //unneeded
+    [20] = {NullItemID.ID_ESAU, "character_003x_esau.png"},  //unneeded
+    [21] = {NullItemID.ID_ISAAC_B, "character_001b_isaac.png"},
+    [22] = {NullItemID.ID_MAGDALENE_B, "character_002b_magdalene.png"},
+    [23] = {NullItemID.ID_CAIN_B, "character_003b_cain.png"},
+    [24] = {NullItemID.ID_JUDAS_B, "character_004b_judas.png"},   //need to make skin shadow
+    [25] = {NullItemID.ID_BLUEBABY_B, "character_005b_bluebaby.png"},    //need to make skin blue
+    [26] = {NullItemID.ID_EVE_B, "character_006b_eve.png"},
+    [27] = {NullItemID.ID_SAMSON_B, "character_007b_samson.png"},
+    [28] = {NullItemID.ID_AZAZEL_B, "character_008b_azazel.png"}, //need to make skin black, though I think his costume already does that
+    [29] = {NullItemID.ID_LAZARUS_B, "character_009b_lazarus.png"},//unneeded
+    [30] = {NullItemID.ID_EDEN_B, "character_009_eden.png"},
+    [31] = {NullItemID.ID_LOST_B, "character_012b_thelost.png"},  //need to make skin grey
+    [32] = {NullItemID.ID_LILITH_B, "character_014b_lilith.png"},  //need to make skin black
+    [33] = {NullItemID.ID_KEEPER_B, "character_015b_keeper.png"},//need to make skin grey
+    [34] = {NullItemID.ID_APOLLYON_B,"character_016b_apollyon.png"},//need to make skin grey
+    [35] = {NullItemID.ID_FORGOTTEN_B, "character_016b_theforgotten.png"},//need to make skin grey
+    [36] = {NullItemID.ID_BETHANY_B, "character_018b_bethany.png"},
+    [37] = {NullItemID.ID_JACOB_B, "character_019b_jacob.png"},
+    [38] = {NullItemID.ID_LAZARUS_B, "character_009b_lazarus2.png"},
+    [39] = {NullItemID.ID_JACOBS_CURSE, "character_019b_jacob2.png"},
+    [40] = {NullItemID.ID_SOUL_B, "character_017b_thesoul.png"} //need to do 'player:SetColor(Color(1.5,1.7,2.0,1.0,0.05,0.11,0.2), -1, 1, false, false)' afterwards to char to give it the ghostly effect
+}
+
+local BloodlustedEnemies = {}
+
+// Per-heart XY offsets. The first heart has this offset not applied, the second heart has the X offset applied once, etc...
+local hudhealthhoroffset = 12
+local hudhealthveroffset = 10
+
+// Load sprites for UI
+local petrifiedHeartSprite = Sprite()
+petrifiedHeartSprite:Load("gfx/ui/petrifiedheart_sprite.anm2", true)
+
+Mod.DataTable = {}
+local playerCustomHealth = {}
+local playerId = 0
+local trueStageTime = 0
+local stopFireSound = false
+
+local Curses = { //each curse uses 1 << (curseid - 1)
+    CURSE_BROKEN = 1 << (Isaac.GetCurseIdByName("Curse of the Broken!") - 1),
+    CURSE_CAPRICOUS = 1 << (Isaac.GetCurseIdByName("Curse of the Capricous!") - 1)
+    /*,
+    CURSE_Dauntless = 1 << (Isaac.GetCurseIdByName("Curse of the Dauntless!") - 1),
+    CURSE_HOARDER = 1 << (Isaac.GetCurseIdByName("Curse of the Hoarder!") - 1),
+    CURSE_DECIEVER = 1 << (Isaac.GetCurseIdByName("Curse of the Deciever!") - 1),
+    CURSE_SOILED = 1 << (Isaac.GetCurseIdByName("Curse of the Soiled!") - 1),
+    CURSE_CURDLED = 1 << (Isaac.GetCurseIdByName("Curse of the Curdled!") - 1),
+    CURSE_SAVAGE = 1 << (Isaac.GetCurseIdByName("Curse of the Savage!") - 1),
+    CURSE_BENIGHTED = 1 << (Isaac.GetCurseIdByName("Curse of the Benighted!") - 1),
+    CURSE_ENIGMA = 1 << (Isaac.GetCurseIdByName("Curse of the Enigma!") - 1),
+    CURSE_BALEFUL = 1 << (Isaac.GetCurseIdByName("Curse of the Baleful!") - 1),
+    CURSE_HARLOT = 1 << (Isaac.GetCurseIdByName("Curse of the Harlot!") - 1),
+    CURSE_MISER = 1 << (Isaac.GetCurseIdByName("Curse of the Miser!") - 1),
+    CURSE_EMPTY = 1 << (Isaac.GetCurseIdByName("Curse of the Empty!") - 1),
+    CURSE_FETTERED = 1 << (Isaac.GetCurseIdByName("Curse of the Fettered!") - 1),
+    CURSE_ZEALOT = 1 << (Isaac.GetCurseIdByName("Curse of the Zealot!") - 1),
+    CURSE_DESERTER = 1 << (Isaac.GetCurseIdByName("Curse of the Deserter!") - 1),
+    CURSE_WISHFUL = 1 << (Isaac.GetCurseIdByName("Curse of the Wishful!") - 1),
+    CURSE_FAMISHED = 1 << (Isaac.GetCurseIdByName("Curse of the Famished!") - 1),
+    CURSE_UNSTABLE = 1 << (Isaac.GetCurseIdByName("Curse of the Unstable!") - 1),
+    CURSE_INDOLENT = 1 << (Isaac.GetCurseIdByName("Curse of the Indolent!") - 1),
+    CURSE_CURSED = 1 << (Isaac.GetCurseIdByName("Curse of the Cursed!") - 1),
+    CURSE_PRIDE = 1 << (Isaac.GetCurseIdByName("The Curse of Pride?") - 1)
+    */
+}
+
+local ModPillEffects = {
+	PILLPOCALYPSE = Isaac.GetPillEffectByName("PILLPOCALYPSE!"),
+    PILLCOLLAPSE = Isaac.GetPillEffectByName("Pillcollapse?"),
+    PETRIFICATION = Isaac.GetPillEffectByName("Petrification"),
+    LEPROSY = Isaac.GetPillEffectByName("Leprosy"),
+    PARANOIA = Isaac.GetPillEffectByName("Paranoia"),
+    METH = Isaac.GetPillEffectByName("Methamphetamines"),
+    XANNY = Isaac.GetPillEffectByName("Xanax"),
+    FLAX = Isaac.GetPillEffectByName("ƒ-lax"),
+    XXLAX = Isaac.GetPillEffectByName("Ж-lax"),
+    CLOTTING_AGENT = Isaac.GetPillEffectByName("Clotting Agent"),
+	PHANTOM_PAINS = Isaac.GetPillEffectByName("Phantom Pains"),
+    SEEING_RED_GOOD = Isaac.GetPillEffectByName("I'm Seeing Red!"),
+    SEEING_RED_BAD = Isaac.GetPillEffectByName("I'm Seeing Red?"),
+    THC = Isaac.GetPillEffectByName("THC"),
+    JESUS_PILLS = Isaac.GetPillEffectByName("Jesus Pills"),
+    PLAN_B = Isaac.GetPillEffectByName("Plan B"),
+    ROSE_TINTED = Isaac.GetPillEffectByName("Rose Tinted Glasses"),
+    DEMENTIA = Isaac.GetPillEffectByName("Dementia"),
+    SPIRIT_SALTS = Isaac.GetPillEffectByName("Spirit Salts"),
+    BATH_SALTS = Isaac.GetPillEffectByName("Bath Salts"),
+    IMMAGINARY_FRIENDS = Isaac.GetPillEffectByName("Imaginary Friends"),
+    HALLUCINATIONS = Isaac.GetPillEffectByName("Hallucinations"),
+    SEEING_GOLD_GOOD = Isaac.GetPillEffectByName("I'm Seeing Gold!"),
+    SEEING_GOLD_BAD = Isaac.GetPillEffectByName("I'm Seeing Gold?"),
+    FRIENDS_TO_THE_VERY_END = Isaac.GetPillEffectByName("Friends to the Very End"),
+    DUKE_PHEROMONES = Isaac.GetPillEffectByName("Duke Pheromones"),
+    CALCIFICATION = Isaac.GetPillEffectByName("Calcification"),
+    ACETOMETAPHIN = Isaac.GetPillEffectByName("Acetaminophen"),
+    PARACETOMOL = Isaac.GetPillEffectByName("Paracetamol"),
+    BIPOLAR = Isaac.GetPillEffectByName("Bipolar"),
+    I_FOUND_BIG_PILLS = Isaac.GetPillEffectByName("I found BIG pills!"),
+    DIURETICS = Isaac.GetPillEffectByName("Diuretics"),
+    SOMETHINGS_REALLY_WRONG = Isaac.GetPillEffectByName("Somethings really wrong"),
+    WEIGHT_GAIN_SUPPLEMENTS = Isaac.GetPillEffectByName("Weight Gain Supplements"),
+    WEIGHT_LOSS_SUPPLEMENTS = Isaac.GetPillEffectByName("Weight Loss Supplements"),
+    ABSOLUTE_CHAOS = Isaac.GetPillEffectByName("Absolute Chaos"),
+    MINDBLOWING = Isaac.GetPillEffectByName("Mindblowing"),
+    PSILOCYBIN = Isaac.GetPillEffectByName("Psilocybin"),
+    MYSTERY_DRUG = Isaac.GetPillEffectByName("Mystery Drug"),
+    SPEED = Isaac.GetPillEffectByName("Speed"),
+    PHARMACEUTICAL_HEALING = Isaac.GetPillEffectByName("Pharmaceutical Healing"),
+    HEARTBROKEN = Isaac.GetPillEffectByName("Heartbroken"),
+    CRASH = Isaac.GetPillEffectByName("Energy Crash!")
+}
+
+local DoctorItemPool = {
+    CollectibleType.COLLECTIBLE_VIRUS,
+    CollectibleType.COLLECTIBLE_ROID_RAGE,
+    CollectibleType.COLLECTIBLE_GROWTH_HORMONES,
+    CollectibleType.COLLECTIBLE_PHD,
+    CollectibleType.COLLECTIBLE_MOMS_BOTTLE_OF_PILLS,
+    CollectibleType.COLLECTIBLE_FORGET_ME_NOW,
+    CollectibleType.COLLECTIBLE_SPEED_BALL,
+    CollectibleType.COLLECTIBLE_MOMS_COIN_PURSE,
+    CollectibleType.COLLECTIBLE_EXPERIMENTAL_TREATMENT,
+    CollectibleType.COLLECTIBLE_LITTLE_BAGGY,
+    CollectibleType.COLLECTIBLE_CAFFEINE_PILL,
+    CollectibleType.COLLECTIBLE_SYNTHOIL,
+    CollectibleType.COLLECTIBLE_PLACEBO,
+    CollectibleType.COLLECTIBLE_PLAN_C,
+    CollectibleType.COLLECTIBLE_ACID_BABY,
+    CollectibleType.COLLECTIBLE_ADRENALINE,
+    CollectibleType.COLLECTIBLE_LIL_SPEWER,
+    CollectibleType.COLLECTIBLE_EUTHANASIA,
+    CollectibleType.COLLECTIBLE_FALSE_PHD
+}
+
+local pauseVars = {
+    isPaused = false,
+    shouldUnpause = false
+}
+

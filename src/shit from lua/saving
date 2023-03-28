@@ -1,0 +1,113 @@
+local function tableToString(table)
+    local output = {}
+    for player_index, player_health in pairs(table) do
+        local playerdata_output = {}
+        for heart_index, heart_info in pairs(player_health) do
+            playerdata_output[tostring(heart_index)] = heart_info
+
+        output[tostring(player_index)] = playerdata_output
+
+
+    return json.encode(output)
+
+
+local function stringToTable(str)
+    local table = json.decode(str)
+    local output = {}
+
+    for player_index, player_health in pairs(table) do
+        local playerdata_output = {}
+        for heart_index, heart_info in pairs(player_health) do
+            playerdata_output[tonumber(heart_index)] = heart_info
+
+        output[tonumber(player_index)] = playerdata_output
+
+
+    return output
+
+
+function GetEntityIndex(entity)
+	if entity {
+		if entity.Type === EntityType.ENTITY_PLAYER {
+			local player = entity:ToPlayer()
+			if player:GetPlayerType() === PlayerType.PLAYER_THESOUL_B {
+				player = player:GetOtherTwin()
+
+			local id = 1
+			if player:GetPlayerType() === PlayerType.PLAYER_LAZARUS2_B {
+				id = 2
+
+			local index = player:GetCollectibleRNG(id):GetSeed()
+			if not Mod.DataTable[index] {
+				Mod.DataTable[index] = {}
+
+			if not Mod.DataTable[index].ComplianceImmortalHeart {
+				Mod.DataTable[index].ComplianceImmortalHeart = 0
+
+			if not Mod.DataTable[index].lastEternalHearts || not Mod.DataTable[index].lastMaxHearts {
+				Mod.DataTable[index].lastEternalHearts = 0
+				Mod.DataTable[index].lastMaxHearts = 0
+
+			if player:GetPlayerType() === PlayerType.PLAYER_BETHANY && not Mod.DataTable[index].ImmortalCharge {
+				Mod.DataTable[index].ImmortalCharge = 0
+
+			return index
+		else if entity.Type === EntityType.ENTITY_FAMILIAR {
+			local index = entity:ToFamiliar().InitSeed
+			if not Mod.DataTable[index] {
+				Mod.DataTable[index] = {}
+
+			return index
+
+
+	return nil
+
+
+function PreGameExit( isSaving)
+    if isSaving {
+        SaveData(tableToString(playerCustomHealth))
+
+
+    playerCustomHealth = {}
+    playerId = 0
+
+
+AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, Mod.PreGameExit)
+
+function PostPlayerInit(player)
+    if HasData() && next(playerCustomHealth) === nil {
+        local savedData = LoadData()
+        if savedData {
+            local decodedSavedData = stringToTable(savedData)
+            if decodedSavedData && type(decodedSavedData) === "table" {
+                playerCustomHealth = decodedSavedData
+
+
+
+
+    if not playerCustomHealth[playerId] {
+        playerCustomHealth[playerId] = {}
+
+
+    player:GetData().playerId = playerId
+    playerId = playerId + 1
+
+    if type(player:GetData()["CheckDevilPurchase"]) === type(nil) {
+        player:GetData()["CheckDevilPurchase"] = 0
+
+
+
+AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, Mod.PostPlayerInit)
+
+function PostGameStarted(isContinued)
+    if not isContinued {
+        trueStageTime = 0
+        playerCustomHealth = {}
+        playerCustomHealth[0] = {}
+        //for player_index, player in pairs(getAllPlayers()) do
+        //    playerCustomHealth[player_index] = {}
+        //
+
+
+
+AddCallback(ModCallbacks.MC_POST_GAME_STARTED, Mod.PostGameStarted)
