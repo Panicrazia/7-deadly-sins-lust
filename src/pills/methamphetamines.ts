@@ -1,42 +1,52 @@
-/**
- * :GetDevilRoomDeals() <-- see if this method tracks devil deals made, it wont work for multiplayer but its
- * @param pillEffect
- * @param player
- * @param flags
- */
+import { CacheFlag } from "isaac-typescript-definitions";
+import {
+    game,
+    getPlayerFromIndex,
+    mapDeletePlayer,
+    mapSetPlayer,
+    PlayerIndex,
+} from "isaacscript-common";
+import { isHorsePill } from "./pills";
 
+const methPlayerValues = {
+    meth: new Map<PlayerIndex, [int, int]>(),
+};
 
-function PillEffectMETH(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
-
-    let index = GetEntityIndex(player)
+function METH(player: EntityPlayer) {
+    let horse = isHorsePill(player);
 
     //Game.GetDevilRoomDeals()
     //Mod.DataTable[index].DevilDealsTaken
     //turns out there was actually a devil deal tracker lol
+    mapSetPlayer(methPlayerValues.meth, player, [
+        ((horse && 2) || 1) * 900,
+        math.min(game.GetDevilRoomDeals(), 10),
+    ]);
 
-    if(Game.GetDevilRoomDeals() > 0) {
-        Mod.DataTable[index].Methamphetamines = {((horse && 2 || 1) * 900), -1}
+    MethCacheFlags(player);
+}
+
+function MethCacheFlags(player: EntityPlayer) {
+    player.AddCacheFlags(CacheFlag.DAMAGE);
+    player.AddCacheFlags(CacheFlag.FIRE_DELAY);
+    player.AddCacheFlags(CacheFlag.SHOT_SPEED);
+    player.AddCacheFlags(CacheFlag.RANGE);
+    player.AddCacheFlags(CacheFlag.SPEED);
+    player.AddCacheFlags(CacheFlag.TEAR_FLAG);
+    player.AddCacheFlags(CacheFlag.FLYING);
+    player.EvaluateItems();
+}
+
+export function methPostUpdate(): void {
+    for (const [playerIndex, meth] of methPlayerValues.meth) {
+        let player = getPlayerFromIndex(playerIndex);
+        if (meth[0] > 0) {
+            meth[0]--;
+        } else {
+            if (player) {
+                mapDeletePlayer(methPlayerValues.meth, player);
+                MethCacheFlags(player);
+            }
+        }
     }
-else {
-        Mod.DataTable[index].Methamphetamines = {((horse && 2 || 1) * 900), math.min(Game.GetDevilRoomDeals(), 10)}
-
-
-    MethCacheFlags(player)
-
-function MethCacheFlags(player)
-    player.AddCacheFlags(CacheFlag.CACHE_DAMAGE)
-    player.AddCacheFlags(CacheFlag.CACHE_FIREDELAY)
-    player.AddCacheFlags(CacheFlag.CACHE_SHOTSPEED)
-    player.AddCacheFlags(CacheFlag.CACHE_RANGE)
-    player.AddCacheFlags(CacheFlag.CACHE_SPEED)
-    player.AddCacheFlags(CacheFlag.CACHE_TEARFLAG)
-    player.AddCacheFlags(CacheFlag.CACHE_FLYING)
-    player.EvaluateItems()
-end
-
-if(Mod.DataTable[index].Methamphetamines !== undefined && Mod.DataTable[index].Methamphetamines[1] > 0) {
-    Mod.DataTable[index].Methamphetamines[1] = Mod.DataTable[index].Methamphetamines[1] - 1
-    if(Mod.DataTable[index].Methamphetamines[1] === 0 ) {
-        Mod.DataTable[index].Methamphetamines = {0,0}
-        MethCacheFlags(player)
+}

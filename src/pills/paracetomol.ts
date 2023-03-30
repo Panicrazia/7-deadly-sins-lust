@@ -1,7 +1,10 @@
-function PillEffectPARACETOMOL(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
-    for i=1, (horse && 7 || 3), 1 {
-        player.AddWisp(CollectibleType.COLLECTIBLE_MAMA_MEGA, player.Position)
+import { CollectibleType } from "isaac-typescript-definitions";
+import { isHorsePill } from "./pills";
 
-    player.AddWisp(CollectibleType.COLLECTIBLE_MOMS_BOTTLE_OF_PILLS, player.Position)
-end
+function PARACETOMOL(player: EntityPlayer) {
+    let horse = isHorsePill(player);
+    for (let i = 0; (horse && 7) || 3; 1) {
+        player.AddWisp(CollectibleType.MAMA_MEGA, player.Position);
+    }
+    player.AddWisp(CollectibleType.MOMS_BOTTLE_OF_PILLS, player.Position);
+}

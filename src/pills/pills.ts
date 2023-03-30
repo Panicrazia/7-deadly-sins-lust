@@ -1,4 +1,8 @@
-import { CollectibleType } from "isaac-typescript-definitions";
+import {
+    CollectibleType,
+    LevelStage,
+    StageType,
+} from "isaac-typescript-definitions";
 import { game, getNPCs } from "isaacscript-common";
 
 const ModPillEffects = {
@@ -71,7 +75,7 @@ export function removeOldestItem(
     return collectibleToRemove;
 }
 
-export function forceCloseDoors() {
+export function forceCloseDoors(): void {
     if (getNPCs().length > 0) {
         let room = game.GetRoom();
         let door;
@@ -82,6 +86,17 @@ export function forceCloseDoors() {
             }
         }
     }
+}
+
+export function IsBasement1(): boolean {
+    //curse you downpour and dross 1 for also being LevelStage.STAGE1_1
+
+    let backdrop = game.GetRoom().GetBackdropType();
+    return (
+        game.GetLevel().GetStage() === LevelStage.BASEMENT_1 &&
+        game.GetLevel().GetStageType() !== StageType.REPENTANCE
+    );
+    //and ((backdrop === BackdropType.BASEMENT) || (backdrop === BackdropType.CELLAR) || (backdrop === BackdropType.BURNING_BASEMENT))
 }
 
 // function GetPillEffect(pillEffect :PillEffect, pillColor :PillColor) {

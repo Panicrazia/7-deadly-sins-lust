@@ -1,7 +1,9 @@
-function PillEffectIMMAGINARY_FRIENDS(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
+import { isHorsePill } from "./pills";
 
-    for i = 1, ((horse && 2 || 1)*5), 1 {
-        player.AddMinisaac(player.Position, true)
+function IMMAGINARY_FRIENDS(player: EntityPlayer) {
+    let horse = isHorsePill(player);
 
-end
+    for (let i = 0; i < ((horse && 2) || 1) * 5; i++) {
+        player.AddMinisaac(player.Position, true);
+    }
+}

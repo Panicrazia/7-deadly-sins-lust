@@ -1,4 +1,6 @@
-function PillEffectKRAKATOA(pillEffect, player, flags);
-let horse = IsHorsePill(player);
-//shoot out a barage of explosivo shots directly up in the air, they { stick to whatever they hit && eventually explode
-end;
+import { isHorsePill } from "./pills";
+
+function KRAKATOA(player: EntityPlayer) {
+    let horse = isHorsePill(player);
+    //TODO: do
+}

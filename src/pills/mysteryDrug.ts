@@ -1,8 +1,6 @@
-function PillEffectMYSTERY_DRUG(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
-    ShootYellowElectricity(player)
-    for i, entity in ipairs(Isaac.GetRoomEntities()) {
-        //entity.AddEntityFlags(EntityFlag.FLAG_SLOW)
+import { isHorsePill } from "./pills";
 
-    //random puddles of friendly poison spawn in the room, creating friendly poison clouds
-end
+function MYSTERY_DRUG(player: EntityPlayer) {
+    let horse = isHorsePill(player);
+    //TODO: random puddles of friendly poison spawn in the room, creating friendly poison clouds
+}
