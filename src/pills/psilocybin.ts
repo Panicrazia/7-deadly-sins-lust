@@ -1,7 +1,16 @@
-function PillEffectPSILOCYBIN(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
+import { CollectibleType } from "isaac-typescript-definitions";
+import { isHorsePill } from "./pills";
 
-    for i = 1, (horse && 10 || 5), 1 {
-        player.UseActiveItem(CollectibleType.COLLECTIBLE_WAVY_CAP, true, false, true, false, -1)
+function PSILOCYBIN(player: EntityPlayer) {
+    let horse = isHorsePill(player);
 
-end
+    for (let i = 0; i < ((horse && 10) || 5); i++) {
+        player.UseActiveItem(
+            CollectibleType.WAVY_CAP,
+            false,
+            false,
+            true,
+            false,
+        );
+    }
+}

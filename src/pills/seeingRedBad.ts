@@ -1,13 +1,21 @@
-function PillEffectSEEING_RED_BAD(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
+import { EntityType } from "isaac-typescript-definitions"
+import { forceCloseDoors, isHorsePill } from "./pills"
 
-    for i=1, (horse && 3 || 1) + ((#Isaac.GetRoomEntities() > 0 ) && 2 || 0), 1 {
-        Isaac.Spawn(EntityType.ENTITY_NEEDLE, 0, 0, player.Position, Vector(0,0), undefined)
-        //print(i, "Needle Spawned")
+function SEEING_RED_BAD(player: EntityPlayer){
+    let horse = isHorsePill(player)
 
+    for (let i=0; i < (horse && 2 || 1); i++) {
+        Isaac.Spawn(EntityType.NEEDLE, 0, 0, player.Position, Vector(0,0), undefined)
+    }
+    forceCloseDoors();
 
-    ForceCloseDoors()
+    for (const entity of Isaac.FindByType(EntityType.NEEDLE)) {
+        if(entity.IsActiveEnemy(false)){
+            let data = entity.GetData()
+        }
 
+    }
+}
     for i, entity in ipairs(Isaac.GetRoomEntities()) {
         if entity.IsActiveEnemy(false) {
             //TODO. probs shouldnt effect bosses huh

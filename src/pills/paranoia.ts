@@ -1,16 +1,24 @@
-function PillEffectPARANOIA(pillEffect, player, flags)
-    let horse = IsHorsePill(player)
+import { CacheFlag } from "isaac-typescript-definitions";
+import { mapSetPlayer, PlayerIndex } from "isaacscript-common";
+import { isHorsePill } from "./pills";
 
-    let index = GetEntityIndex(player)
-	let extraVanishingTwins = horse && 2 || 1
+const paranoiaPlayerValues = {
+    extraVanishingTwins: new Map<PlayerIndex, int>(),
+};
 
-    if(Mod.DataTable[index].ExtraVanishingTwins === undefined) {
-        Mod.DataTable[index].ExtraVanishingTwins = extraVanishingTwins
-    }
-else {
-        Mod.DataTable[index].ExtraVanishingTwins = Mod.DataTable[index].ExtraVanishingTwins + extraVanishingTwins
+function PARANOIA(player: EntityPlayer) {
+    let horse = isHorsePill(player);
 
+    mapSetPlayer(
+        paranoiaPlayerValues.extraVanishingTwins,
+        player,
+        (horse && 2) || 1,
+    );
 
-    player.AddCacheFlags(CacheFlag.CACHE_FAMILIARS)
-    player.EvaluateItems()
-end
+    ParanoiaCacheFlags(player);
+}
+
+function ParanoiaCacheFlags(player: EntityPlayer) {
+    player.AddCacheFlags(CacheFlag.FAMILIARS);
+    player.EvaluateItems();
+}

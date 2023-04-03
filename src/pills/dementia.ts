@@ -1,7 +1,7 @@
 import { CacheFlag } from "isaac-typescript-definitions";
 import {
     getCollectibleQuality,
-    getPlayerIndex,
+    mapGetPlayer,
     mapSetPlayer,
     PlayerIndex,
 } from "isaacscript-common";
@@ -16,8 +16,9 @@ function DEMENTIA(player: EntityPlayer) {
     let removedItem = removeOldestItem(player);
     if (removedItem) {
         let removedQuality = getCollectibleQuality(removedItem);
-        let previousValue = dementiaPlayerValues.dementiaTears.get(
-            getPlayerIndex(player),
+        let previousValue = mapGetPlayer(
+            dementiaPlayerValues.dementiaTears,
+            player,
         );
         if (previousValue) {
             mapSetPlayer(
